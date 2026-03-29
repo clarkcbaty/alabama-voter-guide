@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alabama Voter Guide — Birmingham & Surrounding Counties</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --crimson: #9B1B30;
+    --crimson-dark: #7A1526;
+    --gold: #C9A227;
+    --gold-light: #E8D48B;
+    --cream: #FDF8F0;
+    --cream-dark: #F0E6D3;
+    --charcoal: #2A2A2A;
+    --slate: #4A4A4A;
+    --white: #FFFFFF;
+    --blue: #1B5E9B;
+    --shadow: 0 4px 24px rgba(155,27,48,0.08);
+    --shadow-lg: 0 12px 48px rgba(155,27,48,0.12);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Outfit',sans-serif; background:var(--cream); color:var(--charcoal); line-height:1.7; overflow-x:hidden; }
+
+  /* COUNTER BAR */
+  .counter-bar { position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(42,42,42,0.95); backdrop-filter:blur(12px); color:var(--white); display:flex; justify-content:space-between; align-items:center; padding:0.6rem 2rem; font-size:0.82rem; border-bottom:2px solid var(--crimson); }
+  .counter-bar .logo-text { font-family:'DM Serif Display',serif; font-size:1rem; color:var(--gold-light); cursor:pointer; }
+  .counter-bar .visitor-count { display:flex; align-items:center; gap:0.5rem; color:rgba(255,255,255,0.7); }
+  .counter-bar .visitor-count strong { font-weight:600; color:var(--gold-light); font-variant-numeric:tabular-nums; }
+
+  /* NAV */
+  .nav-strip { position:sticky; top:38px; z-index:90; background:rgba(253,248,240,0.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--cream-dark); padding:0.75rem 2rem; display:flex; justify-content:center; gap:0.4rem; flex-wrap:wrap; }
+  .nav-strip a { text-decoration:none; color:var(--slate); font-size:0.85rem; font-weight:500; padding:0.45rem 1rem; border-radius:100px; transition:all 0.25s; border:1px solid transparent; cursor:pointer; }
+  .nav-strip a:hover, .nav-strip a.active { background:var(--white); color:var(--crimson); border-color:var(--cream-dark); box-shadow:var(--shadow); }
+
+  /* PAGES */
+  .page { display:none; }
+  .page.active { display:block; }
+
+  /* HERO */
+  .hero { position:relative; min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:6rem 2rem 4rem; background:radial-gradient(ellipse at 20% 50%,rgba(155,27,48,0.06) 0%,transparent 60%),radial-gradient(ellipse at 80% 30%,rgba(201,162,39,0.06) 0%,transparent 50%),var(--cream); overflow:hidden; }
+  .hero::before { content:''; position:absolute; top:-200px; right:-200px; width:600px; height:600px; border:1px solid rgba(155,27,48,0.07); border-radius:50%; animation:pulse-ring 8s ease-in-out infinite; }
+  .hero::after { content:''; position:absolute; bottom:-100px; left:-100px; width:400px; height:400px; border:1px solid rgba(201,162,39,0.08); border-radius:50%; animation:pulse-ring 10s ease-in-out infinite reverse; }
+  @keyframes pulse-ring { 0%,100%{transform:scale(1);opacity:0.5;} 50%{transform:scale(1.1);opacity:1;} }
+
+  .hero-badge { display:inline-flex; align-items:center; gap:0.5rem; background:var(--white); border:1px solid var(--cream-dark); border-radius:100px; padding:0.5rem 1.25rem; font-size:0.85rem; font-weight:500; color:var(--crimson); margin-bottom:2rem; letter-spacing:0.05em; text-transform:uppercase; animation:fadeDown 0.8s ease-out; box-shadow:var(--shadow); }
+  .hero-badge .dot { width:8px; height:8px; background:var(--crimson); border-radius:50%; animation:blink 2s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+  .hero h1 { font-family:'DM Serif Display',serif; font-size:clamp(3rem,7vw,5.5rem); color:var(--crimson); line-height:1.1; margin-bottom:1.25rem; animation:fadeUp 1s ease-out; position:relative; z-index:1; }
+  .hero h1 em { color:var(--gold); font-style:italic; }
+  .hero-sub { font-size:1.2rem; color:var(--slate); max-width:580px; font-weight:300; margin-bottom:3rem; animation:fadeUp 1s ease-out 0.2s both; position:relative; z-index:1; }
+
+  .home-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.5rem; max-width:780px; width:100%; animation:fadeUp 1s ease-out 0.4s both; position:relative; z-index:1; }
+  .home-card { background:var(--white); border-radius:20px; padding:2.5rem 2rem; border:1px solid var(--cream-dark); cursor:pointer; transition:all 0.35s ease; position:relative; overflow:hidden; text-align:left; }
+  .home-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; border-radius:20px 20px 0 0; transition:opacity 0.35s; opacity:0; }
+  .home-card:first-child::before { background:linear-gradient(90deg,var(--crimson),var(--gold)); }
+  .home-card:last-child::before { background:linear-gradient(90deg,var(--gold),var(--crimson)); }
+  .home-card:hover { transform:translateY(-6px); box-shadow:var(--shadow-lg); }
+  .home-card:hover::before { opacity:1; }
+  .home-card-icon { width:56px; height:56px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:1.6rem; margin-bottom:1.25rem; }
+  .home-card:first-child .home-card-icon { background:rgba(155,27,48,0.08); }
+  .home-card:last-child .home-card-icon { background:rgba(201,162,39,0.12); }
+  .home-card h2 { font-family:'DM Serif Display',serif; font-size:1.4rem; color:var(--charcoal); margin-bottom:0.5rem; }
+  .home-card p { font-size:0.92rem; color:var(--slate); font-weight:300; margin-bottom:1.25rem; }
+  .home-card .card-link { font-size:0.88rem; font-weight:600; color:var(--crimson); display:inline-flex; align-items:center; gap:0.4rem; transition:gap 0.3s; }
+  .home-card:hover .card-link { gap:0.7rem; }
+
+  /* COUNTDOWN */
+  .countdown-strip { background:var(--white); border-top:1px solid var(--cream-dark); padding:3rem 2rem; text-align:center; }
+  .countdown-strip h3 { font-family:'DM Serif Display',serif; font-size:1.2rem; color:var(--charcoal); margin-bottom:1.25rem; }
+  .countdown-boxes { display:flex; justify-content:center; gap:1.5rem; flex-wrap:wrap; }
+  .countdown-box { background:var(--cream); border-radius:14px; padding:1.25rem 1.75rem; min-width:100px; border:1px solid var(--cream-dark); }
+  .countdown-box .num { font-family:'DM Serif Display',serif; font-size:2.2rem; color:var(--crimson); line-height:1; }
+  .countdown-box .lbl { font-size:0.78rem; color:var(--slate); font-weight:500; text-transform:uppercase; letter-spacing:0.06em; margin-top:0.3rem; }
+
+  /* SHARED */
+  .page-header { padding:7rem 2rem 3rem; text-align:center; background:radial-gradient(ellipse at 30% 50%,rgba(155,27,48,0.05) 0%,transparent 60%),var(--cream); }
+  .page-header .back-link { display:inline-flex; align-items:center; gap:0.4rem; font-size:0.85rem; font-weight:500; color:var(--crimson); cursor:pointer; margin-bottom:1.5rem; text-decoration:none; transition:gap 0.3s; }
+  .page-header .back-link:hover { gap:0.7rem; }
+  .page-header h1 { font-family:'DM Serif Display',serif; font-size:clamp(2.2rem,5vw,3.5rem); color:var(--charcoal); line-height:1.15; margin-bottom:0.75rem; }
+  .page-header h1 em { color:var(--crimson); font-style:italic; }
+  .page-header p { font-size:1.05rem; color:var(--slate); font-weight:300; max-width:600px; margin:0 auto; }
+
+  .section { max-width:960px; margin:0 auto; padding:4rem 2rem; }
+  .section-label { display:inline-block; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.12em; color:var(--crimson); background:rgba(155,27,48,0.06); padding:0.35rem 1rem; border-radius:100px; margin-bottom:1rem; }
+  .section h2 { font-family:'DM Serif Display',serif; font-size:clamp(1.8rem,3.5vw,2.5rem); color:var(--charcoal); margin-bottom:0.75rem; line-height:1.2; }
+  .section-intro { font-size:1.02rem; color:var(--slate); max-width:640px; font-weight:300; margin-bottom:2.5rem; }
+  .divider { max-width:960px; margin:0 auto; padding:0 2rem; }
+  .divider hr { border:none; height:1px; background:var(--cream-dark); }
+
+  /* CARDS */
+  .card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:1.25rem; }
+  .card { background:var(--white); border-radius:16px; padding:1.75rem; border:1px solid var(--cream-dark); transition:all 0.35s ease; position:relative; overflow:hidden; }
+  .card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--crimson),var(--gold)); opacity:0; transition:opacity 0.35s; }
+  .card:hover { transform:translateY(-4px); box-shadow:var(--shadow-lg); }
+  .card:hover::before { opacity:1; }
+  .card-icon { width:48px; height:48px; border-radius:12px; background:rgba(155,27,48,0.06); display:flex; align-items:center; justify-content:center; margin-bottom:1rem; font-size:1.4rem; }
+  .card h3 { font-size:1rem; font-weight:600; color:var(--charcoal); margin-bottom:0.4rem; }
+  .card p { font-size:0.88rem; color:var(--slate); font-weight:300; }
+
+  /* ACCORDION */
+  .rule-block { background:var(--white); border-radius:16px; border:1px solid var(--cream-dark); margin-bottom:1rem; overflow:hidden; transition:box-shadow 0.3s; }
+  .rule-block:hover { box-shadow:var(--shadow); }
+  .rule-header { display:flex; align-items:center; gap:1rem; padding:1.5rem 1.75rem; cursor:pointer; user-select:none; }
+  .rule-num { width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--crimson),var(--crimson-dark)); color:var(--white); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; flex-shrink:0; }
+  .rule-title { flex:1; font-weight:600; font-size:1rem; color:var(--charcoal); }
+  .rule-toggle { font-size:1.4rem; color:var(--crimson); transition:transform 0.3s; font-weight:300; }
+  .rule-block.open .rule-toggle { transform:rotate(45deg); }
+  .rule-body { max-height:0; overflow:hidden; transition:max-height 0.4s ease,padding 0.4s ease; }
+  .rule-block.open .rule-body { max-height:600px; padding:0 1.75rem 1.5rem 4.75rem; }
+  .rule-body p { font-size:0.92rem; color:var(--slate); font-weight:300; line-height:1.8; }
+
+  /* TIMELINE */
+  .steps { position:relative; padding-left:2.5rem; }
+  .steps::before { content:''; position:absolute; left:15px; top:0; bottom:0; width:2px; background:linear-gradient(to bottom,var(--crimson),var(--gold)); border-radius:2px; }
+  .step { position:relative; margin-bottom:2.5rem; padding-left:1.5rem; }
+  .step::before { content:''; position:absolute; left:-2.5rem; top:6px; width:12px; height:12px; background:var(--crimson); border:3px solid var(--cream); border-radius:50%; z-index:1; }
+  .step h3 { font-size:1.05rem; font-weight:600; color:var(--charcoal); margin-bottom:0.35rem; }
+  .step p { font-size:0.92rem; color:var(--slate); font-weight:300; }
+
+  /* CALLOUT */
+  .callout { background:linear-gradient(135deg,var(--crimson),var(--crimson-dark)); border-radius:20px; padding:2.5rem; color:var(--white); margin:2.5rem 0; position:relative; overflow:hidden; }
+  .callout::before { content:''; position:absolute; top:-50px; right:-50px; width:200px; height:200px; border:1px solid rgba(255,255,255,0.1); border-radius:50%; }
+  .callout h3 { font-family:'DM Serif Display',serif; font-size:1.4rem; margin-bottom:0.6rem; }
+  .callout p { font-size:0.92rem; opacity:0.9; font-weight:300; max-width:600px; }
+  .callout a { display:inline-block; margin-top:1rem; background:var(--white); color:var(--crimson); padding:0.65rem 1.4rem; border-radius:100px; font-weight:600; font-size:0.88rem; text-decoration:none; transition:all 0.3s; }
+  .callout a:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.2); }
+
+  /* LOCAL ELECTIONS */
+  .date-banner { display:flex; align-items:center; gap:1rem; background:var(--white); border:1px solid var(--cream-dark); border-radius:14px; padding:1.25rem 1.5rem; margin-bottom:0.75rem; transition:box-shadow 0.3s; }
+  .date-banner:hover { box-shadow:var(--shadow); }
+  .date-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .date-dot.primary { background:var(--crimson); }
+  .date-dot.runoff { background:var(--gold); }
+  .date-dot.general { background:var(--charcoal); }
+  .date-text { font-weight:600; font-size:0.95rem; color:var(--charcoal); }
+  .date-desc { font-size:0.85rem; color:var(--slate); font-weight:300; margin-left:auto; }
+
+  .race-section { background:var(--white); border-radius:18px; border:1px solid var(--cream-dark); margin-bottom:1.5rem; overflow:hidden; }
+  .race-header { padding:1.5rem 1.75rem; border-bottom:1px solid var(--cream-dark); display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+  .race-header h3 { font-family:'DM Serif Display',serif; font-size:1.15rem; color:var(--charcoal); }
+  .race-tag { font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; padding:0.25rem 0.75rem; border-radius:100px; margin-left:auto; }
+  .race-tag.statewide { background:rgba(155,27,48,0.08); color:var(--crimson); }
+  .race-tag.county { background:rgba(201,162,39,0.12); color:#8B7318; }
+  .race-tag.federal { background:rgba(27,94,155,0.08); color:var(--blue); }
+
+  .candidate-list { padding:1rem 1.75rem; }
+  .party-group { margin-bottom:1rem; }
+  .party-label { font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem; padding-left:0.25rem; }
+  .party-label.rep { color:#C0392B; }
+  .party-label.dem { color:#2471A3; }
+  .party-label.ind { color:var(--slate); }
+
+  .candidate-chip { display:inline-flex; align-items:center; gap:0.4rem; background:var(--cream); border:1px solid var(--cream-dark); border-radius:100px; padding:0.4rem 1rem; font-size:0.85rem; font-weight:400; color:var(--charcoal); margin:0 0.4rem 0.5rem 0; transition:all 0.2s; }
+  .candidate-chip:hover { background:var(--white); box-shadow:var(--shadow); }
+  .candidate-chip .incumbent { font-size:0.65rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--gold); background:rgba(201,162,39,0.15); padding:0.15rem 0.45rem; border-radius:4px; }
+
+  .disclaimer-box { background:rgba(201,162,39,0.08); border:1px solid rgba(201,162,39,0.2); border-radius:12px; padding:1.25rem 1.5rem; margin-bottom:2.5rem; font-size:0.88rem; color:var(--slate); font-weight:300; display:flex; align-items:flex-start; gap:0.75rem; }
+  .disclaimer-box .warn-icon { font-size:1.2rem; flex-shrink:0; }
+
+  /* FOOTER */
+  footer { text-align:center; padding:2.5rem 2rem; color:var(--slate); font-size:0.82rem; font-weight:300; background:var(--white); border-top:1px solid var(--cream-dark); margin-top:2rem; }
+  footer strong { color:var(--crimson); font-weight:600; }
+  footer a { color:var(--crimson); text-decoration:none; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+  @keyframes fadeDown { from{opacity:0;transform:translateY(-12px);} to{opacity:1;transform:translateY(0);} }
+  .fade-in { opacity:0; transform:translateY(24px); transition:opacity 0.6s ease,transform 0.6s ease; }
+  .fade-in.visible { opacity:1; transform:translateY(0); }
+
+  @media (max-width:640px) {
+    .counter-bar { padding:0.5rem 1rem; font-size:0.75rem; }
+    .nav-strip { gap:0.2rem; padding:0.5rem 0.75rem; }
+    .nav-strip a { font-size:0.78rem; padding:0.4rem 0.7rem; }
+    .section { padding:3rem 1.25rem; }
+    .callout { padding:1.75rem; }
+    .card-grid { grid-template-columns:1fr; }
+    .home-cards { grid-template-columns:1fr; }
+    .date-banner { flex-wrap:wrap; }
+    .date-desc { margin-left:0; }
+    .page-header { padding:6rem 1.25rem 2.5rem; }
+    .race-tag { margin-left:0; margin-top:0.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COUNTER BAR -->
+<div class="counter-bar">
+  <span class="logo-text" onclick="showPage('home')">AL Voter Guide</span>
+  <span class="visitor-count">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Visitors: <strong id="visitorCount">0</strong>
+  </span>
+</div>
+
+<!-- NAV -->
+<nav class="nav-strip">
+  <a onclick="showPage('home')" class="active" data-page="home">Home</a>
+  <a onclick="showPage('process')" data-page="process">Election Process</a>
+  <a onclick="showPage('local')" data-page="local">Local Elections</a>
+</nav>
+
+<!-- ==================== HOME ==================== -->
+<div class="page active" id="page-home">
+  <section class="hero">
+    <div class="hero-badge"><span class="dot"></span> 2026 Election Season</div>
+    <h1>Your Guide to<br>Voting in <em>Alabama</em></h1>
+    <p class="hero-sub">Everything Birmingham-area voters need — from what to bring to the polls, to who's on your ballot this year.</p>
+    <div class="home-cards">
+      <div class="home-card" onclick="showPage('process')">
+        <div class="home-card-icon">🗳️</div>
+        <h2>Election Process</h2>
+        <p>Accepted photo IDs, registration rules, polling hours, absentee voting, and a step-by-step Election Day guide.</p>
+        <span class="card-link">Explore Guide →</span>
+      </div>
+      <div class="home-card" onclick="showPage('local')">
+        <div class="home-card-icon">📍</div>
+        <h2>Local Elections</h2>
+        <p>Birmingham & surrounding county races, candidates, key dates, and what's on the ballot for Jefferson and Shelby counties.</p>
+        <span class="card-link">View Races →</span>
+      </div>
+    </div>
+  </section>
+  <div class="countdown-strip">
+    <h3>Countdown to the Primary — May 19, 2026</h3>
+    <div class="countdown-boxes" id="countdown"></div>
+  </div>
+</div>
+
+<!-- ==================== ELECTION PROCESS ==================== -->
+<div class="page" id="page-process">
+  <div class="page-header">
+    <a class="back-link" onclick="showPage('home')">← Back to Home</a>
+    <h1>The <em>Election Process</em></h1>
+    <p>What to bring, what to know, and how to cast your ballot in Alabama.</p>
+  </div>
+
+  <section class="section fade-in">
+    <span class="section-label">What to Bring</span>
+    <h2>Accepted Photo IDs</h2>
+    <p class="section-intro">Alabama law requires every voter to present a valid photo ID. Any one of these will work.</p>
+    <div class="card-grid">
+      <div class="card"><div class="card-icon">🪪</div><h3>Alabama Driver's License</h3><p>Valid or expired less than 60 days. ALEA digital licenses accepted.</p></div>
+      <div class="card"><div class="card-icon">🏛️</div><h3>Alabama Nondriver ID</h3><p>State-issued nondriver ID card. Digital versions from ALEA accepted.</p></div>
+      <div class="card"><div class="card-icon">📘</div><h3>U.S. Passport</h3><p>A valid United States passport works at all Alabama polling locations.</p></div>
+      <div class="card"><div class="card-icon">🗳️</div><h3>Alabama Photo Voter ID</h3><p>Free from the Secretary of State, county Board of Registrars, or mobile ID unit.</p></div>
+      <div class="card"><div class="card-icon">🎖️</div><h3>Government Employee ID</h3><p>Photo employee ID from any branch of the U.S. government or State of Alabama.</p></div>
+      <div class="card"><div class="card-icon">🎓</div><h3>College / University ID</h3><p>Student or employee ID from any AL college or university. Digital student IDs accepted.</p></div>
+      <div class="card"><div class="card-icon">🔒</div><h3>AL Corrections Release ID</h3><p>Valid release temporary ID or movement/booking sheet with photo.</p></div>
+      <div class="card"><div class="card-icon">🌐</div><h3>Other State-Issued ID</h3><p>Photo ID from any other U.S. state, current or expired less than 60 days.</p></div>
+    </div>
+    <div class="callout">
+      <h3>Don't Have a Photo ID?</h3>
+      <p>Get a free Alabama Photo Voter ID card at your county Board of Registrars, the Secretary of State's office, or a mobile ID unit — no cost, year-round.</p>
+      <a href="https://www.sos.alabama.gov/alabama-votes/photo-voter-id" target="_blank" rel="noopener">Learn How →</a>
+    </div>
+  </section>
+
+  <div class="divider"><hr></div>
+
+  <section class="section fade-in">
+    <span class="section-label">Know the Rules</span>
+    <h2>Alabama Election Rules</h2>
+    <p class="section-intro">Key rules governing Alabama elections.</p>
+    <div class="rule-block open"><div class="rule-header" onclick="toggleRule(this)"><span class="rule-num">1</span><span class="rule-title">Voter Eligibility</span><span class="rule-toggle">+</span></div><div class="rule-body"><p>U.S. citizen, Alabama resident, at least 18 on or before Election Day. Cannot have been declared mentally incompetent or convicted of a disqualifying felony involving moral turpitude (unless voting rights have been restored).</p></div></div>
+    <div class="rule-block"><div class="rule-header" onclick="toggleRule(this)"><span class="rule-num">2</span><span class="rule-title">Registration Deadline — 14 Days Before</span><span class="rule-toggle">+</span></div><div class="rule-body"><p>Register online at the Secretary of State's website (if you have an AL driver's license or nondriver ID), in person at your county Board of Registrars, or at various government offices. New state residents may register the same day they move in but must still meet the 14-day cutoff.</p></div></div>
+    <div class="rule-block"><div class="rule-header" onclick="toggleRule(this)"><span class="rule-num">3</span><span class="rule-title">Polling Hours — 7 AM to 7 PM</span><span class="rule-toggle">+</span></div><div class="rule-body"><p>All Alabama polling places are open from 7:00 AM to 7:00 PM on Election Day. If you are in line by 7 PM, you have the right to cast your ballot regardless of wait time.</p></div></div>
+    <div class="rule-block"><div class="rule-header" onclick="toggleRule(this)"><span class="rule-num">4</span><span class="rule-title">No Early Voting</span><span class="rule-toggle">+</span></div><div class="rule-body"><p>Alabama does not offer early voting or in-person absentee voting. Absentee ballots require a qualifying reason, a copy of your photo ID with the application, and the completed ballot must be notarized or signed by two adult witnesses.</p></div></div>
+    <div class="rule-block"><div class="rule-header" onclick="toggleRule(this)"><span class="rule-num">5</span><span class="rule-title">Primary Crossover Rule</span><span class="rule-toggle">+</span></div><div class="rule-body"><p>Alabama has open primaries — you don't register by party. But if a runoff occurs, you must vote in the same party's runoff as the primary you participated in.</p></div></div>
+    <div class="rule-block"><div class="rule-header" onclick="toggleRule(this)"><span class="rule-num">6</span><span class="rule-title">Accessibility at the Polls</span><span class="rule-toggle">+</span></div><div class="rule-body"><p>All polling places must be accessible. Equipment to accommodate voters with disabilities is available at every location. A poll worker will ask if you need assistance.</p></div></div>
+    <div class="rule-block"><div class="rule-header" onclick="toggleRule(this)"><span class="rule-num">7</span><span class="rule-title">Address Changes</span><span class="rule-toggle">+</span></div><div class="rule-body"><p>Same precinct: no update needed. New precinct, same county: provisional ballot at new location. New county: must re-register before the deadline.</p></div></div>
+  </section>
+
+  <div class="divider"><hr></div>
+
+  <section class="section fade-in">
+    <span class="section-label">Step by Step</span>
+    <h2>How to Vote on Election Day</h2>
+    <div class="steps">
+      <div class="step"><h3>1. Confirm Registration & Polling Place</h3><p>Use the Secretary of State's "My Voting Information" tool online.</p></div>
+      <div class="step"><h3>2. Bring Your Photo ID</h3><p>Must be valid or expired fewer than 60 days. Physical ID required (except ALEA digital licenses and digital student IDs).</p></div>
+      <div class="step"><h3>3. Go to Your Polling Place (7 AM – 7 PM)</h3><p>If you're in line by 7 PM, you will be allowed to vote.</p></div>
+      <div class="step"><h3>4. Present Your ID</h3><p>A poll worker checks your ID against the voter roll and provides your ballot.</p></div>
+      <div class="step"><h3>5. Cast Your Ballot</h3><p>Mark your choices and feed it into the tabulation machine.</p></div>
+    </div>
+  </section>
+
+  <div class="divider"><hr></div>
+
+  <section class="section fade-in">
+    <span class="section-label">No ID? You Can Still Vote</span>
+    <h2>Provisional Ballot Options</h2>
+    <div class="card-grid" style="grid-template-columns:repeat(auto-fill,minmax(250px,1fr));">
+      <div class="card"><div class="card-icon">👤</div><h3>Two Officials Verify You</h3><p>If two election officials positively identify you, they sign an affidavit and you vote normally.</p></div>
+      <div class="card"><div class="card-icon">📋</div><h3>Provisional Ballot</h3><p>Present valid photo ID to the Board of Registrars by 5 PM on Friday after the election.</p></div>
+      <div class="card"><div class="card-icon">🆓</div><h3>Free Voter ID</h3><p>Available year-round at your county Board of Registrars or a mobile ID unit.</p></div>
+    </div>
+  </section>
+
+  <div class="divider"><hr></div>
+
+  <section class="section fade-in">
+    <span class="section-label">Helpful Links</span>
+    <h2>Resources</h2>
+    <div class="card-grid">
+      <div class="card"><div class="card-icon">🌐</div><h3>Secretary of State</h3><p><a href="https://www.sos.alabama.gov/alabama-votes" target="_blank" rel="noopener" style="color:var(--crimson);font-weight:500;">sos.alabama.gov</a></p></div>
+      <div class="card"><div class="card-icon">📞</div><h3>Elections Hotline</h3><p><strong style="color:var(--crimson);">(334) 242-7210</strong><br><strong style="color:var(--crimson);">1-800-274-8683</strong></p></div>
+      <div class="card"><div class="card-icon">🔍</div><h3>Check Registration</h3><p><a href="https://myinfo.alabamavotes.gov/voterview" target="_blank" rel="noopener" style="color:var(--crimson);font-weight:500;">My Voting Information</a></p></div>
+      <div class="card"><div class="card-icon">⚖️</div><h3>Voter Protection</h3><p><strong style="color:var(--crimson);">1-866-OUR-VOTE</strong></p></div>
+    </div>
+  </section>
+</div>
+
+<!-- ==================== LOCAL ELECTIONS ==================== -->
+<div class="page" id="page-local">
+  <div class="page-header">
+    <a class="back-link" onclick="showPage('home')">← Back to Home</a>
+    <h1>Birmingham & <em>Local Elections</em></h1>
+    <p>Races, candidates, and key dates for Jefferson County, Shelby County, and statewide offices on your 2026 ballot.</p>
+  </div>
+
+  <section class="section">
+    <div class="disclaimer-box">
+      <span class="warn-icon">⚠️</span>
+      <div><strong>Candidate info is based on qualified filings as of March 2026.</strong> Lists may not include all candidates. Always verify with the <a href="https://www.sos.alabama.gov/alabama-votes/voter/election-information/2026" target="_blank" rel="noopener" style="color:var(--crimson);">Alabama Secretary of State</a> or your county Board of Registrars.</div>
+    </div>
+
+    <span class="section-label">Mark Your Calendar</span>
+    <h2>2026 Key Election Dates</h2>
+    <p class="section-intro">The three dates every Alabama voter should know.</p>
+    <div class="date-banner"><span class="date-dot primary"></span><span class="date-text">May 19, 2026</span><span class="date-desc">Primary Election</span></div>
+    <div class="date-banner"><span class="date-dot runoff"></span><span class="date-text">June 16, 2026</span><span class="date-desc">Primary Runoff (if needed)</span></div>
+    <div class="date-banner" style="margin-bottom:3rem;"><span class="date-dot general"></span><span class="date-text">November 3, 2026</span><span class="date-desc">General Election</span></div>
+  </section>
+
+  <div class="divider"><hr></div>
+
+  <section class="section fade-in">
+    <span class="section-label">Statewide Races</span>
+    <h2>Governor, U.S. Senate & More</h2>
+    <p class="section-intro">Major statewide races on every Alabama voter's ballot.</p>
+
+    <div class="race-section">
+      <div class="race-header"><h3>Governor</h3><span class="race-tag statewide">Statewide</span></div>
+      <div class="candidate-list">
+        <div class="party-group"><div class="party-label rep">Republican Primary</div>
+          <span class="candidate-chip">Tommy Tuberville</span><span class="candidate-chip">Ken McFeeters</span><span class="candidate-chip">Will Santivasci</span>
+        </div>
+        <div class="party-group"><div class="party-label dem">Democratic Primary</div>
+          <span class="candidate-chip">Doug Jones</span><span class="candidate-chip">Yolanda Flowers</span><span class="candidate-chip">Will Boyd</span><span class="candidate-chip">Ja'Mel Brown</span><span class="candidate-chip">Chad Chig Martin</span><span class="candidate-chip">Nathan Mathis</span>
+        </div>
+        <div class="party-group"><div class="party-label ind">Independent (General)</div><span class="candidate-chip">Ronald Burnette Jr.</span></div>
+      </div>
+    </div>
+
+    <div class="race-section">
+      <div class="race-header"><h3>U.S. Senate</h3><span class="race-tag federal">Federal</span></div>
+      <div class="candidate-list">
+        <div class="party-group"><div class="party-label rep">Republican Primary</div>
+          <span class="candidate-chip">Steve Marshall</span><span class="candidate-chip">Barry Moore</span><span class="candidate-chip">Jared Hudson</span><span class="candidate-chip">Seth Burton</span><span class="candidate-chip">Dale Shelton Deas Jr.</span><span class="candidate-chip">Rodney Walker</span>
+        </div>
+        <div class="party-group"><div class="party-label dem">Democratic Primary</div>
+          <span class="candidate-chip">Dakarai Larriett</span><span class="candidate-chip">Kyle Sweetser</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="race-section">
+      <div class="race-header"><h3>Lieutenant Governor</h3><span class="race-tag statewide">Statewide</span></div>
+      <div class="candidate-list">
+        <div class="party-group"><div class="party-label dem">Democratic Primary</div>
+          <span class="candidate-chip">Phillip Ensler</span><span class="candidate-chip">Darryl D. Perryman</span>
+        </div>
+        <div class="party-group"><div class="party-label rep">Republican Primary</div>
+          <span class="candidate-chip">Multiple candidates — <a href="https://algop.org/qualified-2026-republican-candidates/" target="_blank" rel="noopener" style="color:var(--crimson);text-decoration:none;">view full list</a></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><hr></div>
+
+  <section class="section fade-in">
+    <span class="section-label">Birmingham Area</span>
+    <h2>U.S. House — Districts 6 & 7</h2>
+    <p class="section-intro">Congressional districts covering greater Birmingham.</p>
+
+    <div class="race-section">
+      <div class="race-header"><h3>District 6 — Birmingham Suburbs</h3><span class="race-tag federal">Federal</span></div>
+      <div class="candidate-list">
+        <div class="party-group"><div class="party-label rep">Republican</div><span class="candidate-chip">Gary Palmer <span class="incumbent">Incumbent</span></span></div>
+        <div class="party-group"><div class="party-label dem">Democrat</div><span class="candidate-chip">Keith Pilkington</span></div>
+      </div>
+    </div>
+
+    <div class="race-section">
+      <div class="race-header"><h3>District 7 — Birmingham, Black Belt, Tuscaloosa</h3><span class="race-tag federal">Federal</span></div>
+      <div class="candidate-list">
+        <div class="party-group"><div class="party-label dem">Democrat</div><span class="candidate-chip">Terri Sewell <span class="incumbent">Incumbent</span></span></div>
+        <p style="font-size:0.85rem;color:var(--slate);font-weight:300;">No Republican candidates qualified for this race.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><hr></div>
+
+  <section class="section fade-in">
+    <span class="section-label">Jefferson County</span>
+    <h2>County Races</h2>
+    <p class="section-intro">Jefferson County is electing sheriff, tax assessor, tax collector, all five county commission seats, and judicial positions. Primary: May 19. General: November 3.</p>
+
+    <div class="race-section">
+      <div class="race-header"><h3>Jefferson County Sheriff</h3><span class="race-tag county">County</span></div>
+      <div class="candidate-list"><div class="party-group"><div class="party-label dem">Democrat</div><span class="candidate-chip">Mark Pettway <span class="incumbent">Incumbent</span></span></div></div>
+    </div>
+
+    <div class="race-section">
+      <div class="race-header"><h3>County Commission (All 5 Districts)</h3><span class="race-tag county">County</span></div>
+      <div class="candidate-list">
+        <p style="font-size:0.9rem;color:var(--slate);font-weight:300;margin-bottom:1rem;">All five seats are up. Commissioner Sheila Tyson (D, Dist. 2), Joe Knight (R, Dist. 4), and Mike Bolin (R, Dist. 5) are the sole candidates in their party primaries.</p>
+        <div class="party-group"><div class="party-label" style="color:var(--charcoal);">Current Commission</div>
+          <span class="candidate-chip">D1 — Lashunda Scales</span><span class="candidate-chip">D2 — Sheila Tyson</span><span class="candidate-chip">D3 — Jimmie Stephens</span><span class="candidate-chip">D4 — Joe Knight</span><span class="candidate-chip">D5 — Mike Bolin</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="race-section">
+      <div class="race-header"><h3>Tax Assessor</h3><span class="race-tag county">County</span></div>
+      <div class="candidate-list"><div class="party-group"><div class="party-label dem">Democrat</div><span class="candidate-chip">Gaynell Hendricks <span class="incumbent">Incumbent</span></span></div></div>
+    </div>
+
+    <div class="race-section">
+      <div class="race-header"><h3>Tax Collector</h3><span class="race-tag county">County</span></div>
+      <div class="candidate-list"><div class="party-group"><div class="party-label dem">Democrat</div><span class="candidate-chip">JT Smallwood <span class="incumbent">Incumbent</span></span></div></div>
+    </div>
+
+    <div class="race-section">
+      <div class="race-header"><h3>Circuit & District Judges — 10th Judicial Circuit</h3><span class="race-tag county">County</span></div>
+      <div class="candidate-list">
+        <p style="font-size:0.9rem;color:var(--slate);font-weight:300;margin-bottom:0.75rem;">Multiple judicial seats on the ballot. Qualified candidates include:</p>
+        <span class="candidate-chip">Brian Huff <span class="incumbent">Incumbent</span></span><span class="candidate-chip">Shanta Owens <span class="incumbent">Incumbent</span></span><span class="candidate-chip">Kechia Davis <span class="incumbent">Incumbent</span></span><span class="candidate-chip">Ruby Clark <span class="incumbent">Incumbent</span></span><span class="candidate-chip">Martha Cook <span class="incumbent">Incumbent</span></span><span class="candidate-chip">Maria Fortune <span class="incumbent">Incumbent</span></span><span class="candidate-chip">Jimmy Earley Jr.</span><span class="candidate-chip">Tiffany Jones</span><span class="candidate-chip">Hope Marshall</span>
+      </div>
+    </div>
+
+    <div class="callout">
+      <h3>Jefferson County Probate Court — Election Hub</h3>
+      <p>For the most complete and current candidate lists, sample ballots, and precinct info.</p>
+      <a href="https://jeffcoprobatecourt.com/elections/scheduled-elections/" target="_blank" rel="noopener">Visit JeffCo Probate →</a>
+    </div>
+  </section>
+
+  <div class="divider"><hr></div>
+
+  <section class="section fade-in">
+    <span class="section-label">Shelby County</span>
+    <h2>Shelby County Elections</h2>
+    <p class="section-intro">Shelby County (Alabaster, Hoover area, Helena, Pelham, Calera) follows the same statewide election calendar.</p>
+    <div class="race-section">
+      <div class="race-header"><h3>Shelby County Races</h3><span class="race-tag county">County</span></div>
+      <div class="candidate-list">
+        <p style="font-size:0.9rem;color:var(--slate);font-weight:300;margin-bottom:0.75rem;">Shelby County voters will see statewide races (Governor, U.S. Senate, Lt. Governor, etc.) and may fall in Congressional District 6 depending on precinct. County-level candidate filings are available below.</p>
+        <div style="margin-top:0.75rem;">
+          <span class="candidate-chip"><a href="https://www.shelbyal.com/1148/Candidates" target="_blank" rel="noopener" style="color:var(--crimson);text-decoration:none;font-weight:500;">Shelby County Elections Page →</a></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><hr></div>
+
+  <section class="section fade-in">
+    <span class="section-label">On the Ballot</span>
+    <h2>Proposed Amendments — May 2026</h2>
+    <p class="section-intro">Statewide constitutional amendments on the May 19 primary ballot.</p>
+    <div class="race-section">
+      <div class="race-header"><h3>Amendment 1</h3><span class="race-tag statewide">Statewide</span></div>
+      <div class="candidate-list"><p style="font-size:0.9rem;color:var(--slate);font-weight:300;">Would allow judges to deny bail for certain offenses involving weapon discharges and solicitation, attempt, or conspiracy to commit murder.</p></div>
+    </div>
+    <div class="race-section">
+      <div class="race-header"><h3>Amendment 2</h3><span class="race-tag statewide">Statewide</span></div>
+      <div class="candidate-list"><p style="font-size:0.9rem;color:var(--slate);font-weight:300;">Would prohibit reduction of a district attorney's compensation during their term of office.</p></div>
+    </div>
+  </section>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>For informational purposes only — not legal advice. Candidate lists may be incomplete.<br>Verify at <strong><a href="https://www.sos.alabama.gov" target="_blank" rel="noopener">sos.alabama.gov</a></strong>. Built with care for Birmingham-area voters.</p>
+</footer>
+
+<script>
+  function showPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    document.querySelectorAll('.nav-strip a').forEach(a => a.classList.toggle('active', a.dataset.page === page));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(initFaders, 100);
+  }
+
+  (function() {
+    const KEY = 'al_voter_guide_visits';
+    let count = parseInt(localStorage.getItem(KEY) || '0', 10);
+    count++;
+    localStorage.setItem(KEY, count);
+    const el = document.getElementById('visitorCount');
+    let current = 0;
+    const step = Math.max(1, Math.floor(count / 40));
+    const interval = setInterval(() => {
+      current += step;
+      if (current >= count) { current = count; clearInterval(interval); }
+      el.textContent = current.toLocaleString();
+    }, 30);
+  })();
+
+  (function() {
+    const target = new Date('2026-05-19T07:00:00');
+    function update() {
+      const now = new Date();
+      const diff = target - now;
+      if (diff <= 0) { document.getElementById('countdown').innerHTML = '<div class="countdown-box"><span class="num">🗳️</span><span class="lbl">Election Day!</span></div>'; return; }
+      const d = Math.floor(diff / 86400000), h = Math.floor((diff % 86400000) / 3600000), m = Math.floor((diff % 3600000) / 60000), s = Math.floor((diff % 60000) / 1000);
+      document.getElementById('countdown').innerHTML = `<div class="countdown-box"><span class="num">${d}</span><span class="lbl">Days</span></div><div class="countdown-box"><span class="num">${h}</span><span class="lbl">Hours</span></div><div class="countdown-box"><span class="num">${m}</span><span class="lbl">Minutes</span></div><div class="countdown-box"><span class="num">${s}</span><span class="lbl">Seconds</span></div>`;
+    }
+    update(); setInterval(update, 1000);
+  })();
+
+  function toggleRule(header) { header.parentElement.classList.toggle('open'); }
+
+  function initFaders() {
+    const faders = document.querySelectorAll('.fade-in:not(.visible)');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } });
+    }, { threshold: 0.1 });
+    faders.forEach(f => observer.observe(f));
+  }
+  initFaders();
+</script>
+</body>
+</html>
